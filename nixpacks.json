@@ -5,11 +5,19 @@
         "nodejs",
         "npm-9_x",
         "libheif",
+        "libde265",
+        "x265",
         "vips",
         "python3",
         "gcc",
         "gnumake",
         "pkg-config"
+      ]
+    },
+    "install": {
+      "cmds": [
+        "npm ci",
+        "npm rebuild sharp --build-from-source"
       ]
     }
   }
