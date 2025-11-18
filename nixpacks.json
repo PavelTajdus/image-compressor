@@ -1,0 +1,14 @@
+{
+  "phases": {
+    "setup": {
+      "nixPkgs": [
+        "libheif",
+        "vips",
+        "python3",
+        "gcc",
+        "gnumake",
+        "pkg-config"
+      ]
+    }
+  }
+}
