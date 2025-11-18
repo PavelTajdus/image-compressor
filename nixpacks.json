@@ -4,14 +4,16 @@
       "nixPkgs": [
         "nodejs",
         "npm-9_x",
-        "libheif",
-        "libde265",
-        "x265",
-        "vips",
+        "git"
+      ],
+      "aptPkgs": [
+        "build-essential",
         "python3",
-        "gcc",
-        "gnumake",
-        "pkg-config"
+        "pkg-config",
+        "libvips-dev",
+        "libheif-dev",
+        "libde265-dev",
+        "libx265-dev"
       ]
     },
     "install": {
