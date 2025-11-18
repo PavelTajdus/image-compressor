@@ -8,3 +8,4 @@ build
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .claude
+.vite

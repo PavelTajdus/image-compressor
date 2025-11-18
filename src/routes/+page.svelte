@@ -168,6 +168,14 @@
 
 <div class="container">
 	<header>
+		<div class="logo">
+			<svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+				<rect width="48" height="48" rx="12" fill="#3b82f6"/>
+				<path d="M14 19L24 14L34 19V29L24 34L14 29V19Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+				<path d="M24 24V34" stroke="white" stroke-width="2" stroke-linecap="round"/>
+				<path d="M14 19L24 24L34 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg>
+		</div>
 		<h1>Image Compressor</h1>
 		<p>Zkomprimuj své obrázky bez ztráty kvality</p>
 	</header>
@@ -282,7 +290,7 @@
 		color: #1a1a1a;
 		min-height: 100vh;
 		padding: 40px 20px;
-		transition: background-color 0.2s ease, color 0.2s ease;
+		transition: background-color 0.3s ease, color 0.3s ease;
 	}
 
 	@media (prefers-color-scheme: dark) {
@@ -300,6 +308,34 @@
 	header {
 		text-align: center;
 		margin-bottom: 60px;
+		animation: fadeInUp 0.6s ease-out;
+	}
+
+	.logo {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 20px;
+		animation: float 3s ease-in-out infinite;
+	}
+
+	.logo svg {
+		filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));
+	}
+
+	@keyframes float {
+		0%, 100% { transform: translateY(0px); }
+		50% { transform: translateY(-10px); }
+	}
+
+	@keyframes fadeInUp {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	h1 {
@@ -308,12 +344,19 @@
 		margin: 0;
 		font-weight: 400;
 		letter-spacing: -0.02em;
+		color: #1a1a1a;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		h1 {
+			color: #e5e5e5;
+		}
 	}
 
 	header p {
 		font-size: 1.1rem;
 		color: #6b6b6b;
-		margin-top: 8px;
+		margin-top: 12px;
 		font-weight: 400;
 	}
 
@@ -324,39 +367,48 @@
 	}
 
 	.upload-zone {
-		background: white;
-		border: 2px solid #e5e5e5;
-		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.8);
+		backdrop-filter: blur(10px);
+		border: 2px dashed #d1d5db;
+		border-radius: 16px;
 		padding: 80px 40px;
 		text-align: center;
 		cursor: pointer;
-		transition: all 0.2s ease;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		min-height: 300px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+		animation: fadeInUp 0.6s ease-out 0.2s both;
 	}
 
 	@media (prefers-color-scheme: dark) {
 		.upload-zone {
-			background: #1a1a1a;
-			border-color: #333;
+			background: rgba(26, 26, 26, 0.8);
+			border-color: #374151;
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 		}
 	}
 
 	.upload-zone:hover {
 		border-color: #3b82f6;
+		box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
+		transform: translateY(-2px);
 	}
 
 	.upload-zone.drag-active {
 		border-color: #3b82f6;
-		background: #eff6ff;
+		background: rgba(59, 130, 246, 0.1);
+		border-style: solid;
+		transform: scale(1.02);
+		box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.3), 0 10px 10px -5px rgba(59, 130, 246, 0.2);
 	}
 
 	@media (prefers-color-scheme: dark) {
 		.upload-zone.drag-active {
-			background: #1e293b;
+			background: rgba(59, 130, 246, 0.15);
 		}
 	}
 
@@ -398,18 +450,25 @@
 
 	.file-label {
 		display: inline-block;
-		padding: 12px 24px;
+		padding: 14px 32px;
 		background: #3b82f6;
 		color: white;
-		border-radius: 8px;
+		border-radius: 10px;
 		cursor: pointer;
-		font-weight: 500;
-		transition: all 0.2s ease;
+		font-weight: 600;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		margin: 20px 0;
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 	}
 
 	.file-label:hover {
 		background: #2563eb;
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+	}
+
+	.file-label:active {
+		transform: translateY(0);
 	}
 
 	.formats {
@@ -454,16 +513,20 @@
 		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 32px;
-		padding: 24px;
-		background: white;
-		border: 1px solid #e5e5e5;
-		border-radius: 12px;
+		padding: 28px;
+		background: rgba(255, 255, 255, 0.8);
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(229, 229, 229, 0.5);
+		border-radius: 16px;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+		animation: fadeInUp 0.6s ease-out;
 	}
 
 	@media (prefers-color-scheme: dark) {
 		.results-header {
-			background: #1a1a1a;
-			border-color: #333;
+			background: rgba(26, 26, 26, 0.8);
+			border-color: rgba(51, 51, 51, 0.5);
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 		}
 	}
 
@@ -502,24 +565,35 @@
 	}
 
 	.image-card {
-		background: white;
-		border: 1px solid #e5e5e5;
-		border-radius: 12px;
-		padding: 24px;
-		transition: border-color 0.2s ease;
+		background: rgba(255, 255, 255, 0.8);
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(229, 229, 229, 0.5);
+		border-radius: 16px;
+		padding: 28px;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+		animation: fadeInUp 0.6s ease-out both;
 	}
 
+	.image-card:nth-child(1) { animation-delay: 0.1s; }
+	.image-card:nth-child(2) { animation-delay: 0.2s; }
+	.image-card:nth-child(3) { animation-delay: 0.3s; }
+
 	.image-card:hover {
-		border-color: #3b82f6;
+		border-color: rgba(59, 130, 246, 0.5);
+		box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
+		transform: translateY(-4px);
 	}
 
 	@media (prefers-color-scheme: dark) {
 		.image-card {
-			background: #1a1a1a;
-			border-color: #333;
+			background: rgba(26, 26, 26, 0.8);
+			border-color: rgba(51, 51, 51, 0.5);
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 		}
 		.image-card:hover {
-			border-color: #3b82f6;
+			border-color: rgba(59, 130, 246, 0.5);
+			box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2);
 		}
 	}
 
