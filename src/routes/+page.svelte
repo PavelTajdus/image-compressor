@@ -214,7 +214,7 @@
 						hidden
 					/>
 				</label>
-				<p class="formats">Podporované formáty: JPG, PNG, WebP, HEIC, AVIF</p>
+				<p class="formats">Podporované formáty: JPG, PNG, WebP, AVIF</p>
 			{/if}
 		</div>
 	{:else}
