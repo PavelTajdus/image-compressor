@@ -2,6 +2,29 @@
 	let dragActive = false;
 	let processing = false;
 	let images = [];
+	
+	// Modal state
+	let modalOpen = false;
+	let modalImage = null;
+
+	function openImageModal(imageSrc, metadata) {
+		modalImage = imageSrc;
+		modalOpen = true;
+		if (metadata) {
+			modalImage = { src: imageSrc, ...metadata };
+		}
+	}
+
+	function closeModal() {
+		modalOpen = false;
+		modalImage = null;
+	}
+
+	function handleKeydown(e) {
+		if (e.key === 'Escape' && modalOpen) {
+			closeModal();
+		}
+	}
 
 	function handleDragOver(e) {
 		e.preventDefault();
@@ -246,7 +269,14 @@
 						<div class="image-preview">
 							<div class="image-box">
 								<span class="label">Původní</span>
-								<img src={image.originalPreview} alt="Původní obrázek" />
+								<img 
+									src={image.originalPreview} 
+									alt="Původní obrázek" 
+									class="clickable-img"
+									on:click={() => openImageModal(image.originalPreview, { format: 'Original', size: image.originalSize })}
+									role="button"
+									tabindex="0"
+								/>
 								<p class="size">{formatSize(image.originalSize)}</p>
 							</div>
 						</div>
@@ -260,7 +290,14 @@
 											<span class="format-label">{format.format.toUpperCase()}</span>
 											<span class="format-size">{formatSize(format.size)}</span>
 										</div>
-										<img src={format.preview} alt="{format.format} preview" class="format-preview" />
+										<img 
+											src={format.preview} 
+											alt="{format.format} preview" 
+											class="format-preview clickable-img"
+											on:click={() => openImageModal(format.preview, { format: format.format.toUpperCase(), size: format.size, savings: getSavings(image.originalSize, format.size) })}
+											role="button"
+											tabindex="0"
+										/>
 										<div class="format-footer">
 											<span class="format-savings">-{getSavings(image.originalSize, format.size)}%</span>
 											<button class="download-btn-small" on:click={() => downloadFormat(format)} aria-label="Stáhnout {format.format}">
@@ -281,6 +318,32 @@
 		</div>
 	{/if}
 </div>
+
+<!-- Modal for image viewing and comparison -->
+<svelte:window on:keydown={handleKeydown} />
+{#if modalOpen}
+	<div class="modal-overlay" on:click={closeModal} role="button" tabindex="-1">
+		<div class="modal-content" on:click|stopPropagation role="dialog">
+			<button class="modal-close" on:click={closeModal} aria-label="Close">
+				×
+			</button>
+
+			<!-- Single image view -->
+			<div class="modal-single">
+				<img src={typeof modalImage === 'object' ? modalImage.src : modalImage} alt="Full size" class="modal-img" />
+				{#if typeof modalImage === 'object'}
+					<div class="modal-info">
+						<span class="modal-format">{modalImage.format}</span>
+						<span class="modal-size">{formatSize(modalImage.size)}</span>
+						{#if modalImage.savings}
+							<span class="modal-savings">-{modalImage.savings}%</span>
+						{/if}
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	:global(body) {
@@ -903,6 +966,354 @@
 
 		.card-header h3 {
 			max-width: 250px;
+		}
+	}
+
+	/* Modal Styles */
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.95);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
+		animation: fadeIn 0.2s ease;
+		padding: 20px;
+	}
+
+	@keyframes fadeIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
+	.modal-content {
+		position: relative;
+		max-width: 1200px;
+		max-height: 90vh;
+		width: 100%;
+		animation: slideUp 0.3s ease;
+	}
+
+	@keyframes slideUp {
+		from {
+			opacity: 0;
+			transform: translateY(30px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.modal-close {
+		position: absolute;
+		top: -10px;
+		right: -10px;
+		background: rgba(59, 130, 246, 0.9);
+		border: 2px solid rgba(255, 255, 255, 0.8);
+		color: white;
+		width: 44px !important;
+		height: 44px !important;
+		min-width: 44px !important;
+		min-height: 44px !important;
+		max-width: 44px !important;
+		max-height: 44px !important;
+		border-radius: 50% !important;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+		z-index: 1001;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+		font-size: 32px;
+		font-weight: 300;
+		line-height: 1;
+		font-family: Arial, sans-serif;
+		flex-shrink: 0;
+		padding: 0;
+		margin: 0;
+		transform: none !important;
+	}
+
+	.modal-close:hover {
+		background: rgba(59, 130, 246, 1);
+		transform: scale(1.1) !important;
+		border-color: white;
+	}
+
+	.modal-single {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 20px;
+	}
+
+	.modal-img {
+		max-width: 100%;
+		max-height: calc(90vh - 100px);
+		border-radius: 12px;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+	}
+
+	.modal-info {
+		display: flex;
+		gap: 20px;
+		align-items: center;
+		background: rgba(255, 255, 255, 0.1);
+		padding: 12px 24px;
+		border-radius: 20px;
+		backdrop-filter: blur(10px);
+	}
+
+	.modal-format {
+		font-weight: 600;
+		color: #3b82f6;
+		font-size: 1rem;
+	}
+
+	.modal-size {
+		color: #e5e5e5;
+		font-size: 0.9rem;
+	}
+
+	.modal-savings {
+		color: #4ade80;
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+
+	/* Comparison View */
+	.modal-compare {
+		width: 100%;
+	}
+
+	.compare-labels {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 16px;
+		padding: 12px 20px;
+		background: rgba(0, 0, 0, 0.3);
+		border-radius: 8px;
+	}
+
+	.compare-label {
+		color: #e5e5e5;
+		font-size: 0.9rem;
+		font-weight: 500;
+	}
+
+	.compare-container {
+		position: relative;
+		width: 100%;
+		height: 600px;
+		min-height: 400px;
+		max-height: calc(90vh - 150px);
+		overflow: hidden;
+		border-radius: 12px;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+		background: #000;
+	}
+
+	.compare-image {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.compare-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		display: block;
+	}
+
+	.original-image {
+		z-index: 1;
+	}
+
+	.compressed-wrapper {
+		z-index: 2;
+		right: 0;
+		left: auto;
+		overflow: hidden;
+	}
+
+	.compressed-image {
+		position: absolute;
+		right: 0;
+		top: 0;
+		height: 100%;
+	}
+
+	.compressed-image img {
+		height: 100%;
+		width: auto;
+		max-width: none;
+		object-fit: contain;
+	}
+
+	.compare-slider {
+		position: absolute;
+		bottom: 20px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 80%;
+		max-width: 400px;
+		z-index: 4;
+		-webkit-appearance: none;
+		appearance: none;
+		height: 4px;
+		background: rgba(255, 255, 255, 0.3);
+		border-radius: 2px;
+		outline: none;
+		cursor: pointer;
+	}
+
+	.compare-slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		background: white;
+		cursor: pointer;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	}
+
+	.compare-slider::-moz-range-thumb {
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		background: white;
+		cursor: pointer;
+		border: none;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	}
+
+	.slider-line {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 2px;
+		background: white;
+		z-index: 3;
+		pointer-events: none;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	}
+
+	.slider-handle {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 40px;
+		height: 40px;
+		background: white;
+		border-radius: 50%;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.slider-handle::before,
+	.slider-handle::after {
+		content: '';
+		position: absolute;
+		width: 8px;
+		height: 8px;
+		border-top: 2px solid #666;
+	}
+
+	.slider-handle::before {
+		border-left: 2px solid #666;
+		transform: rotate(-45deg);
+		left: 10px;
+	}
+
+	.slider-handle::after {
+		border-right: 2px solid #666;
+		transform: rotate(45deg);
+		right: 10px;
+	}
+
+	/* Clickable Images */
+	.clickable-img {
+		cursor: pointer;
+		transition: transform 0.2s, box-shadow 0.2s;
+	}
+
+	.clickable-img:hover {
+		transform: scale(1.02);
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+	}
+
+	/* Format Actions */
+	.format-actions {
+		display: flex;
+		gap: 8px;
+	}
+
+	.compare-btn-small {
+		background: transparent;
+		border: 1px solid #e5e5e5;
+		border-radius: 6px;
+		padding: 6px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #6b6b6b;
+		transition: all 0.2s ease;
+	}
+
+	.compare-btn-small:hover {
+		background: #10b981;
+		color: white;
+		border-color: #10b981;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.compare-btn-small {
+			border-color: #333;
+			color: #9a9a9a;
+		}
+
+		.compare-btn-small:hover {
+			background: #10b981;
+			color: white;
+			border-color: #10b981;
+		}
+	}
+
+	@media screen and (max-width: 768px) {
+		.images-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.formats-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.card-header h3 {
+			max-width: 250px;
+		}
+
+		.compare-labels {
+			flex-direction: column;
+			gap: 8px;
+		}
+
+		.modal-info {
+			flex-wrap: wrap;
+			justify-content: center;
 		}
 	}
 </style>
